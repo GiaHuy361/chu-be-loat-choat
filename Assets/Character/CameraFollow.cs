@@ -11,8 +11,8 @@ public class CameraFollow : MonoBehaviour
     {
         if (!target) return;
 
-        // Follow vị trí
-        Vector3 desiredPos = target.position + target.TransformDirection(offset);
+        // Follow vị trí (offset theo world, KHÔNG xoay theo rotation nhân vật)
+        Vector3 desiredPos = target.position + offset;
         transform.position = Vector3.Lerp(transform.position, desiredPos, followSpeed * Time.deltaTime);
 
         // Look at (nhìn vào ngực / đầu nhân vật)
