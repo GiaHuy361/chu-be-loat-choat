@@ -3,63 +3,130 @@
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMotor : MonoBehaviour
 {
-    [Header("Move")]
-    public float walkSpeed = 2.0f;
-    public float runSpeed = 5.0f;
-    public float rotationSpeed = 720f; // độ/giây
+    [Header("Speed")]
+    public float walkSpeed = 5.5f;
+    public float runSpeed = 9.0f;
 
-    [Header("Gravity")]
-    public float gravity = -20f;
+    [Header("Rotation")]
+    public float rotationSmooth = 16f;
+
+    [Header("Acceleration")]
+    public float acceleration = 30f;
+    public float deceleration = 40f;
+
+    [Header("Jump")]
+    public float jumpHeight = 1.6f;     // tăng lên nếu muốn nhảy cao hơn
+    public float gravity = -25f;        // bạn đang để -25 OK
+    public float groundedStick = -2f;   // dính đất cho ổn định
 
     private CharacterController cc;
     private Animator anim;
+    private FootstepReceiver sfx;
+
     private float verticalVelocity;
+    private float currentSpeed;
+    private bool wasGrounded;
 
     void Awake()
     {
         cc = GetComponent<CharacterController>();
         anim = GetComponent<Animator>();
+        sfx = GetComponent<FootstepReceiver>(); // có thì phát sound, không có thì thôi
     }
 
     void Update()
     {
-        // Input cũ (vì bạn đã bật Both)
-        float x = Input.GetAxisRaw("Horizontal"); // A/D
-        float z = Input.GetAxisRaw("Vertical");   // W/S
-        Vector3 input = new Vector3(x, 0f, z);
-        input = Vector3.ClampMagnitude(input, 1f);
-
+        float h = Input.GetAxisRaw("Horizontal"); // A / D
+        float v = Input.GetAxisRaw("Vertical");   // W / S
         bool run = Input.GetKey(KeyCode.LeftShift);
-        float speed = run ? runSpeed : walkSpeed;
 
-        // hướng theo camera (đi hướng nào camera nhìn)
-        Transform cam = Camera.main.transform;
-        Vector3 camF = cam.forward; camF.y = 0; camF.Normalize();
-        Vector3 camR = cam.right; camR.y = 0; camR.Normalize();
-        Vector3 moveDir = camF * input.z + camR * input.x;
+        bool grounded = cc.isGrounded;
 
-        // xoay nhân vật theo hướng di chuyển
-        if (moveDir.sqrMagnitude > 0.001f)
+        /* =====================
+           SPEED
+           ===================== */
+        bool isMovingForwardOrBack = Mathf.Abs(v) > 0.01f;
+
+        float baseSpeed = run ? runSpeed : walkSpeed;
+        float targetSpeed = isMovingForwardOrBack ? baseSpeed : 0f;
+
+        if (currentSpeed < targetSpeed)
+            currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, acceleration * Time.deltaTime * baseSpeed);
+        else
+            currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, deceleration * Time.deltaTime * baseSpeed);
+
+        /* =====================
+           CAMERA DIRECTION
+           ===================== */
+        Vector3 camForward = Camera.main.transform.forward;
+        Vector3 camRight = Camera.main.transform.right;
+
+        camForward.y = 0f;
+        camRight.y = 0f;
+        camForward.Normalize();
+        camRight.Normalize();
+
+        Vector3 moveDir = camForward * v + camRight * h;
+
+        /* =====================
+           ROTATION
+           ===================== */
+        if (isMovingForwardOrBack)
         {
-            Quaternion targetRot = Quaternion.LookRotation(moveDir);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
+            Vector3 faceDir = camForward;
+            faceDir.y = 0f;
+
+            Quaternion targetRot = Quaternion.LookRotation(faceDir);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, rotationSmooth * Time.deltaTime);
         }
 
-        // gravity
-        if (cc.isGrounded && verticalVelocity < 0f) verticalVelocity = -2f;
-        verticalVelocity += gravity * Time.deltaTime;
+        /* =====================
+           JUMP + GRAVITY
+           ===================== */
+        if (grounded)
+        {
+            // vừa chạm đất
+            if (!wasGrounded)
+                sfx?.PlayLand();
 
-        Vector3 velocity = moveDir * speed;
+            // giữ dính đất
+            if (verticalVelocity < 0f)
+                verticalVelocity = groundedStick;
+
+            // nhảy
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                // v = sqrt(2gh)
+                verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
+                sfx?.PlayJump();
+            }
+        }
+        else
+        {
+            verticalVelocity += gravity * Time.deltaTime;
+        }
+
+        wasGrounded = grounded;
+
+        /* =====================
+           MOVE
+           ===================== */
+        Vector3 velocity = moveDir.normalized * currentSpeed;
         velocity.y = verticalVelocity;
 
         cc.Move(velocity * Time.deltaTime);
 
-        // Animator Speed (0 idle, >0 walk/run)
+        /* =====================
+           ANIMATOR
+           ===================== */
         if (anim != null)
         {
-            // dùng độ lớn input để điều khiển chuyển state
-            float animSpeed = input.magnitude * (run ? 4f : 1f);
-            anim.SetFloat("Speed", animSpeed);
+            float speed01 = Mathf.InverseLerp(0f, runSpeed, currentSpeed);
+            anim.SetFloat("Speed", speed01 * (run ? 4f : 1.6f));
+
+            // Nếu sau này bạn thêm parameter thì mở:
+            // anim.SetBool("Grounded", grounded);
+            // anim.SetFloat("YVel", verticalVelocity);
         }
     }
 }
