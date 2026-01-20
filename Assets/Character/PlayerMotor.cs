@@ -7,6 +7,14 @@ public class PlayerMotor : MonoBehaviour
     public float walkSpeed = 5.5f;
     public float runSpeed = 9.0f;
 
+    [Header("Crouch / Prone Speed")]
+    public float crouchSpeed = 2.5f;   // tốc độ khi khom
+    public float proneSpeed = 1.5f;    // tốc độ khi bò
+
+    [Header("Fast Boost (Shift)")]
+    public float crouchFastMul = 1.6f; // Shift khi khom
+    public float proneFastMul = 1.4f;  // Shift khi bò
+
     [Header("Rotation")]
     public float rotationSmooth = 16f;
 
@@ -15,9 +23,9 @@ public class PlayerMotor : MonoBehaviour
     public float deceleration = 40f;
 
     [Header("Jump")]
-    public float jumpHeight = 1.6f;     // tăng lên nếu muốn nhảy cao hơn
-    public float gravity = -25f;        // bạn đang để -25 OK
-    public float groundedStick = -2f;   // dính đất cho ổn định
+    public float jumpHeight = 1.6f;
+    public float gravity = -25f;
+    public float groundedStick = -2f;
 
     private CharacterController cc;
     private Animator anim;
@@ -31,23 +39,70 @@ public class PlayerMotor : MonoBehaviour
     {
         cc = GetComponent<CharacterController>();
         anim = GetComponent<Animator>();
-        sfx = GetComponent<FootstepReceiver>(); // có thì phát sound, không có thì thôi
+        sfx = GetComponent<FootstepReceiver>();
     }
 
     void Update()
     {
         float h = Input.GetAxisRaw("Horizontal"); // A / D
         float v = Input.GetAxisRaw("Vertical");   // W / S
-        bool run = Input.GetKey(KeyCode.LeftShift);
+        bool shift = Input.GetKey(KeyCode.LeftShift); // Shift (boost)
+        bool run = shift; // giữ biến run để không sửa nhiều chỗ
 
         bool grounded = cc.isGrounded;
+
+        /* =====================
+           CROUCH / PRONE TOGGLE
+           ===================== */
+        if (anim != null)
+        {
+            // Crouch toggle (C)
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                bool nextCrouch = !anim.GetBool("IsCrouch");
+                anim.SetBool("IsCrouch", nextCrouch);
+
+                if (nextCrouch) anim.SetBool("IsProne", false);
+            }
+
+            // Prone toggle (Z)
+            if (Input.GetKeyDown(KeyCode.Z))
+            {
+                bool nextProne = !anim.GetBool("IsProne");
+                anim.SetBool("IsProne", nextProne);
+
+                if (nextProne) anim.SetBool("IsCrouch", false);
+            }
+        }
+
+        bool isCrouch = anim != null && anim.GetBool("IsCrouch");
+        bool isProne = anim != null && anim.GetBool("IsProne");
 
         /* =====================
            SPEED
            ===================== */
         bool isMovingForwardOrBack = Mathf.Abs(v) > 0.01f;
 
-        float baseSpeed = run ? runSpeed : walkSpeed;
+        float baseSpeed;
+
+        // ===== ĐỨNG =====
+        if (!isCrouch && !isProne)
+        {
+            baseSpeed = run ? runSpeed : walkSpeed;
+        }
+        // ===== KHOM =====
+        else if (isCrouch)
+        {
+            baseSpeed = crouchSpeed;
+            if (shift) baseSpeed *= crouchFastMul; // Shift = khom nhanh
+        }
+        // ===== BÒ =====
+        else // isProne
+        {
+            baseSpeed = proneSpeed;
+            if (shift) baseSpeed *= proneFastMul; // Shift = bò nhanh
+        }
+
         float targetSpeed = isMovingForwardOrBack ? baseSpeed : 0f;
 
         if (currentSpeed < targetSpeed)
@@ -85,18 +140,15 @@ public class PlayerMotor : MonoBehaviour
            ===================== */
         if (grounded)
         {
-            // vừa chạm đất
             if (!wasGrounded)
                 sfx?.PlayLand();
 
-            // giữ dính đất
             if (verticalVelocity < 0f)
                 verticalVelocity = groundedStick;
 
-            // nhảy
-            if (Input.GetKeyDown(KeyCode.Space))
+            // đang crouch/prone thì không cho nhảy
+            if (!isCrouch && !isProne && Input.GetKeyDown(KeyCode.Space))
             {
-                // v = sqrt(2gh)
                 verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
                 sfx?.PlayJump();
             }
@@ -121,12 +173,9 @@ public class PlayerMotor : MonoBehaviour
            ===================== */
         if (anim != null)
         {
+            // Nếu bạn dùng Speed để blend, để 0..1 ổn định nhất
             float speed01 = Mathf.InverseLerp(0f, runSpeed, currentSpeed);
-            anim.SetFloat("Speed", speed01 * (run ? 4f : 1.6f));
-
-            // Nếu sau này bạn thêm parameter thì mở:
-            // anim.SetBool("Grounded", grounded);
-            // anim.SetFloat("YVel", verticalVelocity);
+            anim.SetFloat("Speed", speed01);
         }
     }
 }
