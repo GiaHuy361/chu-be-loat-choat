@@ -23,7 +23,11 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.burst": {
+<<<<<<< HEAD
       "version": "1.8.27",
+=======
+      "version": "1.8.26",
+>>>>>>> origin/main
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -42,7 +46,11 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.collab-proxy": {
+<<<<<<< HEAD
       "version": "2.11.2",
+=======
+      "version": "2.10.2",
+>>>>>>> origin/main
       "depth": 0,
       "source": "registry",
       "dependencies": {},
@@ -77,11 +85,19 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.visualstudio": {
+<<<<<<< HEAD
       "version": "2.0.26",
       "depth": 0,
       "source": "registry",
       "dependencies": {
         "com.unity.test-framework": "1.1.33"
+=======
+      "version": "2.0.25",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.test-framework": "1.1.31"
+>>>>>>> origin/main
       },
       "url": "https://packages.unity.com"
     },
@@ -194,7 +210,11 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.timeline": {
+<<<<<<< HEAD
       "version": "1.8.10",
+=======
+      "version": "1.8.9",
+>>>>>>> origin/main
       "depth": 0,
       "source": "registry",
       "dependencies": {
