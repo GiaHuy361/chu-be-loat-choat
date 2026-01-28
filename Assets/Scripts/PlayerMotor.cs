@@ -174,4 +174,26 @@ public class PlayerMotor : MonoBehaviour
             anim.SetFloat("Speed", speed01);
         }
     }
+
+    // ==== PHẦN MỚI THÊM: HÀM NHẬN ANIMATION EVENT OnLand ====
+    // Gắn hàm này để clip JumpLand gọi, tránh lỗi "AnimationEvent 'OnLand' ... has no receiver"
+    public void OnLand()
+    {
+        // đảm bảo trạng thái grounded đúng khi animation chạm đất
+        if (anim != null)
+        {
+            anim.SetBool("IsGrounded", true);
+        }
+
+        // reset vận tốc rơi để nhân vật ổn định sau khi đáp
+        if (verticalVelocity < 0)
+        {
+            verticalVelocity = groundedStick;
+        }
+
+        // chơi âm thanh đáp đất nếu có
+        sfx?.PlayLand();
+
+        Debug.Log("OnLand() called from AnimationEvent");
+    }
 }
