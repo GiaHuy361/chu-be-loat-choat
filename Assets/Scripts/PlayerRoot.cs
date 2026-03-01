@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerRoot : MonoBehaviour
 {
@@ -6,14 +6,18 @@ public class PlayerRoot : MonoBehaviour
 
     private void Awake()
     {
-        // Singleton Pattern: ??m b?o ch? c� 1 Player t?n t?i
+        // Singleton Pattern: Đảm bảo chỉ có 1 Player tồn tại
         if (Instance != null && Instance != this)
         {
-            Destroy(gameObject); // H?y nh�n v?t m?i n?u ?� c� nh�n v?t c?
+            Destroy(gameObject); // Hủy nhân vật mới nếu đã có nhân vật cũ
             return;
         }
 
         Instance = this;
-        DontDestroyOnLoad(gameObject); // Gi? nh�n v?t n�y khi chuy?n Scene
+
+        // [ĐÃ SỬA] Xóa/Comment dòng này lại!
+        // Giờ đây khi Load Scene, nhân vật cũ sẽ chết đi, 
+        // và PlayerSpawner sẽ lo việc đẻ ra một nhân vật mới tinh ở cửa hang.
+        // DontDestroyOnLoad(gameObject); 
     }
 }

@@ -1,6 +1,10 @@
 {
   "dependencies": {
     "com.atteneder.gltfast": "https://github.com/atteneder/glTFast.git",
+    "com.unity.2d.enhancers": "1.0.0",
+    "com.unity.ai.assistant": "1.6.0-pre.3",
+    "com.unity.ai.generators": "1.6.0-pre.3",
+    "com.unity.ai.inference": "2.5.0",
     "com.unity.ai.navigation": "2.0.9",
     "com.unity.cinemachine": "2.10.5",
     "com.unity.collab-proxy": "2.11.2",

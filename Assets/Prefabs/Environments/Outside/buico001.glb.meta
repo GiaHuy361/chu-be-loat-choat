@@ -22,7 +22,7 @@ ScriptedImporter:
     mask: -1
     layer: 0
     skinUpdateWhenOffscreen: 1
-    lightIntensityFactor: 1
+    lightIntensityFactor: 3
     sceneObjectCreation: 2
   assetDependencies: []
   reportItems: []
