@@ -8,6 +8,7 @@ public class UIManager : MonoBehaviour
     public static UIManager Instance;
 
     [Header("1. Left Mission Panel")]
+    public GameObject leftMissionPanel; // (optional) kéo Left_MissionPanel để hide khi fail/end
     public TextMeshProUGUI txtMissionName;
     public TextMeshProUGUI txtMissionDetail;
     public TextMeshProUGUI txtDistance;
@@ -28,23 +29,48 @@ public class UIManager : MonoBehaviour
     public GameObject interactPanel;
     public TextMeshProUGUI txtInteractPrompt;
 
+    [Header("6. NEW: Fail Panel")]
+    public GameObject failPanel;            // Panel chứa nút Retry/Hub
+    public TextMeshProUGUI txtFailReason;   // Text lý do fail (optional)
+
+    [Header("7. NEW: End Panel")]
+    public GameObject endPanel;             // Panel chứa nút Replay/Hub
+    public TextMeshProUGUI txtEndMessage;   // Text kết thúc (optional)
+
+    private bool isShowingResult = false;
+
     void Awake()
     {
         if (Instance == null) Instance = this;
+        else { Destroy(gameObject); return; }
 
         if (interactPanel != null) interactPanel.SetActive(false);
         if (topNotifPanel != null) topNotifPanel.SetActive(false);
         if (bottomDialoguePanel != null) bottomDialoguePanel.SetActive(false);
+
+        if (failPanel != null) failPanel.SetActive(false);
+        if (endPanel != null) endPanel.SetActive(false);
+
+        if (blackScreen != null)
+        {
+            Color c = blackScreen.color;
+            c.a = 0f;
+            blackScreen.color = c;
+        }
     }
 
     public void UpdateMissionPanel(string missionName, string detail)
     {
+        if (isShowingResult) return;
+
         if (txtMissionName != null) txtMissionName.text = "Nhiệm vụ: " + missionName;
         if (txtMissionDetail != null) txtMissionDetail.text = "- " + detail;
     }
 
     public void UpdateDistance(float distance)
     {
+        if (isShowingResult) return;
+
         if (txtDistance == null) return;
         if (distance < 0) txtDistance.text = "";
         else txtDistance.text = "Khoảng cách: " + Mathf.RoundToInt(distance) + "m";
@@ -52,75 +78,166 @@ public class UIManager : MonoBehaviour
 
     public void ShowSystemDialogue(string message, float duration = 3f)
     {
-        StopCoroutine("TempDialogueCoroutine");
+        if (isShowingResult) return;
+
+        StopCoroutine(nameof(TempDialogueCoroutine));
         StartCoroutine(TempDialogueCoroutine(message, duration));
     }
 
     private IEnumerator TempDialogueCoroutine(string message, float duration)
     {
-        bottomDialoguePanel.SetActive(true);
-        txtBottomDialogue.text = message;
+        if (bottomDialoguePanel != null) bottomDialoguePanel.SetActive(true);
+        if (txtBottomDialogue != null) txtBottomDialogue.text = message;
+
         yield return new WaitForSeconds(duration);
-        bottomDialoguePanel.SetActive(false);
+
+        if (bottomDialoguePanel != null) bottomDialoguePanel.SetActive(false);
     }
 
     public void ShowTopNotification(string message, float duration = 3f)
     {
+        if (isShowingResult) return;
+
+        StopCoroutine(nameof(TempTopNotifCoroutine));
         StartCoroutine(TempTopNotifCoroutine(message, duration));
     }
 
     private IEnumerator TempTopNotifCoroutine(string message, float duration)
     {
-        topNotifPanel.SetActive(true);
-        txtTopNotif.text = message;
+        if (topNotifPanel != null) topNotifPanel.SetActive(true);
+        if (txtTopNotif != null) txtTopNotif.text = message;
+
         yield return new WaitForSeconds(duration);
-        topNotifPanel.SetActive(false);
+
+        if (topNotifPanel != null) topNotifPanel.SetActive(false);
     }
 
     public void ShowWinUI()
     {
-        StopAllCoroutines();
-        topNotifPanel.SetActive(true);
-        txtTopNotif.text = "<color=yellow>MISSION COMPLETE</color>";
+        if (isShowingResult) return;
 
+        StopAllCoroutines();
+        if (topNotifPanel != null) topNotifPanel.SetActive(true);
+        if (txtTopNotif != null) txtTopNotif.text = "<color=yellow>MISSION COMPLETE</color>";
         if (winFirework != null) winFirework.Play();
     }
 
+    // ===== FAIL FLOW (FIX: KHÔNG TRÙNG TEXT) =====
     public void ShowLoseUI(string loseMessage)
     {
+        if (isShowingResult) return;
+        isShowingResult = true;
+
         StopAllCoroutines();
-        topNotifPanel.SetActive(true);
-        txtTopNotif.text = "<color=red>MISSION FAILED</color>";
 
-        bottomDialoguePanel.SetActive(true);
-        txtBottomDialogue.text = loseMessage;
+        // Ẩn UI phụ để khỏi rối (KHÔNG XOÁ, CHỈ TẮT)
+        if (bottomDialoguePanel != null) bottomDialoguePanel.SetActive(false); // <- FIX TRÙNG
+        if (interactPanel != null) interactPanel.SetActive(false);
+        if (leftMissionPanel != null) leftMissionPanel.SetActive(false); // optional
 
-        StartCoroutine(FadeToBlack());
+        // Top header (giữ nếu bạn thích)
+        if (topNotifPanel != null) topNotifPanel.SetActive(true);
+        if (txtTopNotif != null) txtTopNotif.text = "<color=red>MISSION FAILED</color>";
+
+        // Chỉ hiện 1 chỗ: FailPanel text
+        if (txtFailReason != null)
+        {
+            // Bạn muốn đổi text thì sửa tại đây (hoặc set trực tiếp trong Inspector)
+            txtFailReason.text = loseMessage;
+        }
+
+        StartCoroutine(FadeToBlackThenShowFail());
     }
 
-    private IEnumerator FadeToBlack()
+    private IEnumerator FadeToBlackThenShowFail()
     {
-        float timer = 0f;
-        while (timer < 2f)
+        yield return Fade(1f, 0.6f);
+
+        if (failPanel != null) failPanel.SetActive(true);
+
+        if (StealthMissionManager.Instance != null)
+            StealthMissionManager.Instance.UnlockCursor();
+    }
+
+    // ===== END FLOW =====
+    public void ShowEndUI(string endMessage)
+    {
+        if (isShowingResult) return;
+        isShowingResult = true;
+
+        StopAllCoroutines();
+
+        if (bottomDialoguePanel != null) bottomDialoguePanel.SetActive(false);
+        if (interactPanel != null) interactPanel.SetActive(false);
+        if (leftMissionPanel != null) leftMissionPanel.SetActive(false);
+
+        if (txtEndMessage != null) txtEndMessage.text = endMessage;
+
+        StartCoroutine(FadeToBlackThenShowEnd());
+    }
+
+    private IEnumerator FadeToBlackThenShowEnd()
+    {
+        yield return Fade(1f, 1.0f);
+
+        if (endPanel != null) endPanel.SetActive(true);
+
+        if (StealthMissionManager.Instance != null)
+            StealthMissionManager.Instance.UnlockCursor();
+    }
+
+    public IEnumerator Fade(float targetAlpha, float duration)
+    {
+        if (blackScreen == null) yield break;
+
+        float startAlpha = blackScreen.color.a;
+        float t = 0f;
+        while (t < duration)
         {
-            timer += Time.deltaTime;
+            t += Time.deltaTime;
+            float a = Mathf.Lerp(startAlpha, targetAlpha, t / duration);
             Color c = blackScreen.color;
-            c.a = Mathf.Lerp(0, 1, timer / 2f);
+            c.a = a;
             blackScreen.color = c;
             yield return null;
         }
-        yield return new WaitForSeconds(2f);
-        StealthMissionManager.Instance.RestartLevel();
-    }
-
-    public void ShowInteractPrompt(string promptMessage)
-    {
-        if (interactPanel != null && !interactPanel.activeSelf) interactPanel.SetActive(true);
-        if (txtInteractPrompt != null) txtInteractPrompt.text = promptMessage;
     }
 
     public void HideInteractPrompt()
     {
         if (interactPanel != null && interactPanel.activeSelf) interactPanel.SetActive(false);
+    }
+
+    public void ShowInteractPrompt(string promptMessage)
+    {
+        if (isShowingResult) return;
+
+        if (interactPanel != null && !interactPanel.activeSelf) interactPanel.SetActive(true);
+        if (txtInteractPrompt != null) txtInteractPrompt.text = promptMessage;
+    }
+
+    // ===== Buttons =====
+    public void OnClickRetry()
+    {
+        if (failPanel != null) failPanel.SetActive(false);
+        if (StealthMissionManager.Instance != null) StealthMissionManager.Instance.RetryCurrentScene();
+    }
+
+    public void OnClickBackToHub()
+    {
+        if (failPanel != null) failPanel.SetActive(false);
+        if (StealthMissionManager.Instance != null) StealthMissionManager.Instance.BackToHub();
+    }
+
+    public void OnClickReplayDemo()
+    {
+        if (endPanel != null) endPanel.SetActive(false);
+        if (StealthMissionManager.Instance != null) StealthMissionManager.Instance.RetryCurrentScene();
+    }
+
+    public void OnClickExitToHub()
+    {
+        if (endPanel != null) endPanel.SetActive(false);
+        if (StealthMissionManager.Instance != null) StealthMissionManager.Instance.BackToHub();
     }
 }

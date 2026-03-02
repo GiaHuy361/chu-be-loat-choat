@@ -14,19 +14,19 @@ public class GuardRandomPatrol : MonoBehaviour
     private bool isForward = true;
 
     private Vector3 initialPosition;
-    private Quaternion initialRotation; 
+    private Quaternion initialRotation;
 
     [Header("Cài đặt Tầm nhìn (Ngày & Đêm)")]
     public Transform player;
-    public bool isNightTime = false; // [MỚI] Tick vào ô này trong Inspector nếu map là ban đêm
+    public bool isNightTime = false;
 
     [Space]
     public float dayViewRadius = 15f;
     [Range(0, 360)] public float dayViewAngle = 90f;
 
     [Space]
-    public float nightViewRadius = 7f; // Ban đêm nhìn gần hơn
-    [Range(0, 360)] public float nightViewAngle = 60f; // Ban đêm góc nhìn hẹp hơn
+    public float nightViewRadius = 7f;
+    [Range(0, 360)] public float nightViewAngle = 60f;
 
     public LayerMask playerMask;
     public LayerMask obstacleMask;
@@ -114,44 +114,36 @@ public class GuardRandomPatrol : MonoBehaviour
         if (anim != null) anim.SetTrigger("Turn");
         yield return new WaitForSeconds(1.867f);
 
-        // --- LOGIC PING-PONG MỚI TẠI ĐÂY ---
         if (isForward)
         {
             currentWaypointIndex++;
-            // Nếu chạm điểm cuối cùng
             if (currentWaypointIndex >= waypoints.Length)
             {
-                currentWaypointIndex = waypoints.Length - 2; // Quay lại điểm áp chót
+                currentWaypointIndex = waypoints.Length - 2;
                 isForward = false;
             }
         }
         else
         {
             currentWaypointIndex--;
-            // Nếu quay về điểm đầu tiên
             if (currentWaypointIndex < 0)
             {
-                currentWaypointIndex = 1; // Bắt đầu đi tiến từ điểm thứ 2
+                currentWaypointIndex = 1;
                 isForward = true;
             }
         }
 
-        // Đảm bảo index không bị âm nếu chỉ có 1 waypoint
         currentWaypointIndex = Mathf.Clamp(currentWaypointIndex, 0, waypoints.Length - 1);
-
         agent.SetDestination(waypoints[currentWaypointIndex].position);
-        // ----------------------------------
 
         agent.isStopped = false;
         isPerformingAction = false;
     }
 
-    // ================= HÀNH VI KIỂM TRA (NGHE TIẾNG ĐỘNG) =================
     public void HearSound(Vector3 soundPosition)
     {
         if (currentState == GuardState.Patrol)
         {
-            Debug.Log(gameObject.name + ": Nghe thấy tiếng động, đang đi kiểm tra!");
             StopAllCoroutines();
             StartCoroutine(FindPlayerWithDelay(0.2f));
             investigateCoroutine = StartCoroutine(InvestigateRoutine(soundPosition));
@@ -166,6 +158,7 @@ public class GuardRandomPatrol : MonoBehaviour
 
         Vector3 dirToSound = (targetPos - transform.position).normalized;
         dirToSound.y = 0;
+
         if (dirToSound != Vector3.zero)
         {
             Quaternion lookRot = Quaternion.LookRotation(dirToSound);
@@ -185,9 +178,7 @@ public class GuardRandomPatrol : MonoBehaviour
         agent.SetDestination(targetPos);
 
         while (agent.pathPending || agent.remainingDistance > 0.5f)
-        {
             yield return null;
-        }
 
         agent.isStopped = true;
         if (anim != null) anim.SetTrigger("Scout");
@@ -203,33 +194,25 @@ public class GuardRandomPatrol : MonoBehaviour
 
     void ChaseBehavior()
     {
-        // [QUAN TRỌNG] Kiểm tra xem Player có bị null không (Tránh lỗi MissingReferenceException)
         if (player == null)
         {
-            // Cố gắng tìm lại Player trong map
             GameObject p = GameObject.FindGameObjectWithTag("Player");
-            if (p != null)
-            {
-                player = p.transform;
-            }
-            else
-            {
-                return; // Nếu vẫn không thấy thì dừng lại, không chạy code bên dưới nữa
-            }
+            if (p != null) player = p.transform;
+            else return;
         }
 
-        // Đuổi theo người chơi
         agent.SetDestination(player.position);
 
-        // Bắt được người chơi
+        // ===== BẮT ĐƯỢC PLAYER =====
         if (Vector3.Distance(transform.position, player.position) <= 1.5f)
         {
             if (StealthMissionManager.Instance != null)
             {
-                StealthMissionManager.Instance.GameOver();
+                StealthMissionManager.Instance.FailMission("Kim Đồng bị bắt... cuộc liên lạc thất bại.");
             }
 
             agent.isStopped = true;
+            if (anim != null) anim.SetBool("isChasing", false);
             this.enabled = false;
         }
     }
@@ -239,20 +222,22 @@ public class GuardRandomPatrol : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(delay);
-            if (currentState != GuardState.Chase) FindVisiblePlayer();
+            if (currentState != GuardState.Chase)
+                FindVisiblePlayer();
         }
     }
 
     void FindVisiblePlayer()
     {
-        // [ĐÃ SỬA] Áp dụng tầm nhìn dựa theo Ngày / Đêm
         float currentRadius = isNightTime ? nightViewRadius : dayViewRadius;
         float currentAngle = isNightTime ? nightViewAngle : dayViewAngle;
 
         Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, currentRadius, playerMask);
+
         for (int i = 0; i < targetsInViewRadius.Length; i++)
         {
             Transform target = targetsInViewRadius[i].transform;
+
             Vector3 eyePos = transform.position + Vector3.up * 1.5f;
             Vector3 targetPos = target.position + Vector3.up * 1.2f;
             Vector3 dirToTarget = (targetPos - eyePos).normalized;
@@ -260,6 +245,7 @@ public class GuardRandomPatrol : MonoBehaviour
             if (Vector3.Angle(transform.forward, (target.position - transform.position).normalized) < currentAngle / 2)
             {
                 float dstToTarget = Vector3.Distance(eyePos, targetPos);
+
                 if (!Physics.Raycast(eyePos, dirToTarget, dstToTarget, obstacleMask))
                 {
                     currentState = GuardState.Chase;
@@ -267,6 +253,7 @@ public class GuardRandomPatrol : MonoBehaviour
                     isPerformingAction = false;
                     agent.isStopped = false;
                     agent.speed = runSpeed;
+
                     if (anim != null) anim.SetBool("isChasing", true);
                 }
             }
