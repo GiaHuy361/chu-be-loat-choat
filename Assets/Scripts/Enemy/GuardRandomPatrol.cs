@@ -35,6 +35,14 @@ public class GuardRandomPatrol : MonoBehaviour
     public float walkSpeed = 2f;
     public float runSpeed = 5f;
 
+    [Header("Âm thanh Bước chân (Lính gác)")]
+    public AudioSource footstepAudioSource;
+    public AudioClip enemyFootstepClip; // Kéo file enemy_footstep vào đây
+    [Range(0f, 1f)] public float footstepVolume = 1f;
+    public float walkStepInterval = 0.6f; // Nhịp bước khi đi bộ
+    public float runStepInterval = 0.35f; // Nhịp bước khi chạy truy đuổi
+    private float stepTimer;
+
     private NavMeshAgent agent;
     private Animator anim;
     private bool isPerformingAction = false;
@@ -55,6 +63,15 @@ public class GuardRandomPatrol : MonoBehaviour
         initialRotation = transform.rotation;
         agent.speed = walkSpeed;
 
+        // Tự động setup âm thanh 3D cho lính gác
+        if (footstepAudioSource == null) footstepAudioSource = GetComponent<AudioSource>();
+        if (footstepAudioSource == null) footstepAudioSource = gameObject.AddComponent<AudioSource>();
+
+        footstepAudioSource.spatialBlend = 1f; // 100% 3D
+        footstepAudioSource.rolloffMode = AudioRolloffMode.Linear;
+        footstepAudioSource.minDistance = 3f;
+        footstepAudioSource.maxDistance = 20f; // Bán kính tối đa để Kim Đồng nghe thấy
+
         if (waypoints.Length > 0)
             agent.SetDestination(waypoints[currentWaypointIndex].position);
 
@@ -64,6 +81,9 @@ public class GuardRandomPatrol : MonoBehaviour
     void Update()
     {
         if (anim != null) anim.SetFloat("Speed", agent.velocity.magnitude);
+
+        // --- GỌI HÀM PHÁT TIẾNG BƯỚC CHÂN ---
+        HandleFootsteps();
 
         if (currentState == GuardState.Chase)
         {
@@ -76,6 +96,34 @@ public class GuardRandomPatrol : MonoBehaviour
         if (currentState == GuardState.Patrol)
         {
             PatrolBehavior();
+        }
+    }
+
+    // --- HỆ THỐNG XỬ LÝ ÂM THANH BƯỚC CHÂN ---
+    void HandleFootsteps()
+    {
+        if (footstepAudioSource == null || enemyFootstepClip == null) return;
+
+        float currentSpeed = agent.velocity.magnitude;
+
+        // Nếu lính gác đang di chuyển (tốc độ > 0.1)
+        if (currentSpeed > 0.1f)
+        {
+            stepTimer -= Time.deltaTime;
+            if (stepTimer <= 0f)
+            {
+                // Thay đổi độ cao ngẫu nhiên để nghe tự nhiên
+                footstepAudioSource.pitch = Random.Range(0.9f, 1.1f);
+                footstepAudioSource.PlayOneShot(enemyFootstepClip, footstepVolume);
+
+                // Cài đặt lại timer dựa trên việc lính đang đi bộ hay đang chạy
+                if (currentState == GuardState.Chase) stepTimer = runStepInterval;
+                else stepTimer = walkStepInterval;
+            }
+        }
+        else
+        {
+            stepTimer = 0f; // Dừng lại là reset timer
         }
     }
 

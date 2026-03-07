@@ -7,45 +7,62 @@ public class MainMenuManager : MonoBehaviour
     public string gameplayScene = "Demo_Terrain";
 
     [Header("UI Panels")]
-    public GameObject guidePanel;
+    public GameObject menuPanel; // Panel chính chứa các nút PLAY, SETTINGS, QUIT
+    public GameObject settingsPanel; // Đã đổi từ guidePanel thành settingsPanel
 
     void Start()
     {
+        // Mở khóa và hiện chuột để người chơi bấm menu
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         Time.timeScale = 1f;
 
-        if (guidePanel != null) guidePanel.SetActive(false);
+        // Đảm bảo panel cài đặt bị ẩn khi mới mở game
+        if (settingsPanel != null) settingsPanel.SetActive(false);
     }
 
+    // Gắn hàm này vào sự kiện OnClick() của nút PLAY
     public void StartGame()
     {
-        // vào game thì khóa chuột để chơi (hợp camera)
+        // Khóa chuột và ẩn chuột đi để chuẩn bị vào game
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        if (!Application.CanStreamedLevelBeLoaded(gameplayScene))
+        if (Application.CanStreamedLevelBeLoaded(gameplayScene))
+        {
+            SceneManager.LoadScene(gameplayScene);
+        }
+        else
         {
             Debug.LogError($"MainMenu: Scene '{gameplayScene}' chưa add vào Build Settings!");
-            return;
         }
-
-        SceneManager.LoadScene(gameplayScene);
     }
 
-    public void OpenGuide()
+    // Gắn hàm này vào sự kiện OnClick() của nút SETTINGS
+    public void OpenSettings()
     {
-        if (guidePanel != null) guidePanel.SetActive(true);
+
+        if (settingsPanel != null)
+        {
+            menuPanel.SetActive(false);
+            settingsPanel.SetActive(true);
+        }
     }
 
-    public void CloseGuide()
+    // Gắn hàm này vào sự kiện OnClick() của nút BACK/APPLY trong bảng Settings
+    public void CloseSettings()
     {
-        if (guidePanel != null) guidePanel.SetActive(false);
+        if (settingsPanel != null)
+        {
+            settingsPanel.SetActive(false);
+            menuPanel.SetActive(true);
+        }
     }
 
+    // Gắn hàm này vào sự kiện OnClick() của nút QUIT
     public void QuitGame()
     {
-        Application.Quit();
         Debug.Log("Quit Game (chỉ hoạt động khi Build)");
+        Application.Quit();
     }
 }

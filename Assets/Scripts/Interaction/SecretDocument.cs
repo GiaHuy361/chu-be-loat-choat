@@ -19,6 +19,12 @@ public class SecretDocument : MonoBehaviour, IInteractable
             UIManager.Instance.HideInteractPrompt();
         }
 
+        // --- PHÁT ÂM THANH NHẶT ĐỒ Ở ĐÂY ---
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayItemPickup();
+        }
+
         // KIỂM TRA XEM ĐÂY LÀ THƯ THẬT HAY GIẢ
         if (isCorrectLetter)
         {

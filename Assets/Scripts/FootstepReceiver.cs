@@ -90,6 +90,12 @@ public class FootstepReceiver : MonoBehaviour
         if (footstepClips != null && footstepClips.Length > 0 && audioSource)
         {
             var clip = footstepClips[Random.Range(0, footstepClips.Length)];
+
+            // --- CẬP NHẬT MỚI ---
+            // Thay đổi độ cao ngẫu nhiên để 1 file nghe như nhiều bước chân khác nhau
+            audioSource.pitch = Random.Range(0.85f, 1.15f);
+            // --------------------
+
             audioSource.PlayOneShot(clip, footstepVolume);
         }
 
@@ -111,13 +117,25 @@ public class FootstepReceiver : MonoBehaviour
 
     public void PlayJump()
     {
-        if (jumpClip && audioSource) audioSource.PlayOneShot(jumpClip, jumpVolume);
+        if (jumpClip && audioSource)
+        {
+            // --- CẬP NHẬT MỚI ---
+            audioSource.pitch = Random.Range(0.9f, 1.1f);
+            // --------------------
+            audioSource.PlayOneShot(jumpClip, jumpVolume);
+        }
         EmitNoise(jumpNoiseRadius);
     }
 
     public void PlayLand()
     {
-        if (landClip && audioSource) audioSource.PlayOneShot(landClip, landVolume);
+        if (landClip && audioSource)
+        {
+            // --- CẬP NHẬT MỚI ---
+            audioSource.pitch = Random.Range(0.85f, 1.1f);
+            // --------------------
+            audioSource.PlayOneShot(landClip, landVolume);
+        }
         EmitNoise(landNoiseRadius);
     }
 

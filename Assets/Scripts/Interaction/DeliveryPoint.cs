@@ -34,6 +34,12 @@ public class DeliveryPoint : MonoBehaviour, IInteractable
             isProcessing = true; // Bật khóa
             StealthMissionManager.Instance.OnDelivered();
 
+            // --- PHÁT ÂM THANH GIAO THƯ Ở ĐÂY ---
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayItemPickup();
+            }
+
             if (UIManager.Instance != null)
             {
                 UIManager.Instance.HideInteractPrompt();
