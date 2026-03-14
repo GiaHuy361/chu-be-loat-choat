@@ -139,8 +139,14 @@ public class ThirdPersonCamera : MonoBehaviour
         }
     }
 
+    // ==========================================
+    // CÁC HÀM XỬ LÝ NÚT BẤM UI (ĐÃ THÊM ÂM THANH)
+    // ==========================================
+
     public void ResumeGame()
     {
+        if (AudioManager.Instance != null && isPaused) AudioManager.Instance.PlayButtonClickSound();
+
         isPaused = false;
         Time.timeScale = 1f;
 
@@ -153,12 +159,29 @@ public class ThirdPersonCamera : MonoBehaviour
 
     public void OpenSettings()
     {
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayButtonClickSound();
+
         if (pausePanel) pausePanel.SetActive(false);
         if (settingsPanel) settingsPanel.SetActive(true);
     }
 
     public void CloseSettings()
     {
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayButtonClickSound();
+
+        if (settingsPanel) settingsPanel.SetActive(false);
+        if (pausePanel) pausePanel.SetActive(true);
+    }
+
+    // Thêm hàm Apply Settings để dùng cho bảng cài đặt âm lượng
+    public void ApplySettingsButton()
+    {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayButtonClickSound();
+            AudioManager.Instance.ApplySettings();
+        }
+
         if (settingsPanel) settingsPanel.SetActive(false);
         if (pausePanel) pausePanel.SetActive(true);
     }
@@ -166,16 +189,38 @@ public class ThirdPersonCamera : MonoBehaviour
     public void RestartGame()
     {
         Time.timeScale = 1f;
-
         Scene scene = SceneManager.GetActiveScene();
-        SceneManager.LoadScene(scene.name);
+
+        // Chạy hiệu ứng mờ nhạc và tải lại cảnh chơi
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayButtonClickSound();
+            AudioManager.Instance.GoToGameplay(scene.name);
+        }
+        else
+        {
+            SceneManager.LoadScene(scene.name);
+        }
     }
 
     public void BackToMenu()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene(menuScene);
+
+        // Chạy hiệu ứng chuyển cảnh và đổi sang nhạc Menu
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.GoToMenu(menuScene);
+        }
+        else
+        {
+            SceneManager.LoadScene(menuScene);
+        }
     }
+
+    // ==========================================
+    // QUẢN LÝ CHUỘT
+    // ==========================================
 
     void LockCursor()
     {

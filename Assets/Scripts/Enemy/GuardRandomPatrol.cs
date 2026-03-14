@@ -31,16 +31,22 @@ public class GuardRandomPatrol : MonoBehaviour
     public LayerMask playerMask;
     public LayerMask obstacleMask;
 
+    [Header("Cài đặt Nghi ngờ (Suspicion)")]
+    [Tooltip("Thời gian lính gác nhìn chằm chằm trước khi phát hiện và đuổi theo")]
+    public float timeToDetect = 1.5f;
+    private float currentDetectionTime = 0f;
+
     [Header("Cài đặt Di chuyển")]
     public float walkSpeed = 2f;
     public float runSpeed = 5f;
 
     [Header("Âm thanh Bước chân (Lính gác)")]
     public AudioSource footstepAudioSource;
-    public AudioClip enemyFootstepClip; // Kéo file enemy_footstep vào đây
-    [Range(0f, 1f)] public float footstepVolume = 1f;
-    public float walkStepInterval = 0.6f; // Nhịp bước khi đi bộ
-    public float runStepInterval = 0.35f; // Nhịp bước khi chạy truy đuổi
+    public AudioClip enemyFootstepClip;
+    [Range(0f, 1f)] public float walkVolume = 0.6f;
+    [Range(0f, 1f)] public float runVolume = 0.8f;
+    public float walkStepInterval = 0.6f;
+    public float runStepInterval = 0.35f;
     private float stepTimer;
 
     private NavMeshAgent agent;
@@ -63,27 +69,29 @@ public class GuardRandomPatrol : MonoBehaviour
         initialRotation = transform.rotation;
         agent.speed = walkSpeed;
 
-        // Tự động setup âm thanh 3D cho lính gác
         if (footstepAudioSource == null) footstepAudioSource = GetComponent<AudioSource>();
         if (footstepAudioSource == null) footstepAudioSource = gameObject.AddComponent<AudioSource>();
 
-        footstepAudioSource.spatialBlend = 1f; // 100% 3D
+        footstepAudioSource.spatialBlend = 1f;
         footstepAudioSource.rolloffMode = AudioRolloffMode.Linear;
         footstepAudioSource.minDistance = 3f;
-        footstepAudioSource.maxDistance = 20f; // Bán kính tối đa để Kim Đồng nghe thấy
+        footstepAudioSource.maxDistance = 20f;
+
+        // Gán sẵn clip vào AudioSource để tránh lỗi phát chồng âm
+        footstepAudioSource.clip = enemyFootstepClip;
 
         if (waypoints.Length > 0)
             agent.SetDestination(waypoints[currentWaypointIndex].position);
-
-        StartCoroutine(FindPlayerWithDelay(0.2f));
     }
 
     void Update()
     {
         if (anim != null) anim.SetFloat("Speed", agent.velocity.magnitude);
 
-        // --- GỌI HÀM PHÁT TIẾNG BƯỚC CHÂN ---
         HandleFootsteps();
+
+        // Luôn kiểm tra tầm nhìn mỗi frame để xử lý độ nghi ngờ
+        HandleDetection();
 
         if (currentState == GuardState.Chase)
         {
@@ -99,32 +107,137 @@ public class GuardRandomPatrol : MonoBehaviour
         }
     }
 
-    // --- HỆ THỐNG XỬ LÝ ÂM THANH BƯỚC CHÂN ---
+    // --- HỆ THỐNG XỬ LÝ ÂM THANH BƯỚC CHÂN (ĐÃ SỬA LỖI ĐỘI QUÂN) ---
     void HandleFootsteps()
     {
         if (footstepAudioSource == null || enemyFootstepClip == null) return;
 
+        // Đảm bảo clip đã được gán và BẬT CHẾ ĐỘ LẶP LẠI (Loop)
+        if (footstepAudioSource.clip != enemyFootstepClip)
+        {
+            footstepAudioSource.clip = enemyFootstepClip;
+        }
+        footstepAudioSource.loop = true;
+
         float currentSpeed = agent.velocity.magnitude;
 
-        // Nếu lính gác đang di chuyển (tốc độ > 0.1)
-        if (currentSpeed > 0.1f)
+        // Nếu lính gác đang di chuyển
+        if (currentSpeed > 0.1f && !agent.isStopped)
         {
-            stepTimer -= Time.deltaTime;
-            if (stepTimer <= 0f)
+            // Nếu âm thanh chưa phát thì bắt đầu phát
+            if (!footstepAudioSource.isPlaying)
             {
-                // Thay đổi độ cao ngẫu nhiên để nghe tự nhiên
-                footstepAudioSource.pitch = Random.Range(0.9f, 1.1f);
-                footstepAudioSource.PlayOneShot(enemyFootstepClip, footstepVolume);
+                footstepAudioSource.Play();
+            }
 
-                // Cài đặt lại timer dựa trên việc lính đang đi bộ hay đang chạy
-                if (currentState == GuardState.Chase) stepTimer = runStepInterval;
-                else stepTimer = walkStepInterval;
+            // Chỉnh tốc độ (pitch) và âm lượng trực tiếp trên clip đang phát
+            if (currentState == GuardState.Chase)
+            {
+                // KHI ĐUỔI: Tua nhanh clip x1.5, âm lượng to
+                footstepAudioSource.pitch = 2f;
+                footstepAudioSource.volume = runVolume;
+            }
+            else
+            {
+                // KHI ĐI TUẦN: Tốc độ clip bình thường (x1), âm lượng nhỏ hơn
+                footstepAudioSource.pitch = 1f;
+                footstepAudioSource.volume = walkVolume;
             }
         }
         else
         {
-            stepTimer = 0f; // Dừng lại là reset timer
+            // Nếu lính gác đứng yên, TẠM DỪNG âm thanh
+            if (footstepAudioSource.isPlaying)
+            {
+                // Dùng Pause() thay vì Stop() để khi đi tiếp, âm thanh nối nhịp tự nhiên hơn
+                footstepAudioSource.Pause();
+            }
         }
+    }
+
+    // --- HỆ THỐNG NGHI NGỜ (SUSPICION) ---
+    void HandleDetection()
+    {
+        if (currentState == GuardState.Chase) return; // Đang đuổi rồi thì không cần tính nghi ngờ nữa
+
+        bool canSee = CanSeePlayer();
+
+        if (canSee)
+        {
+            // Tăng thanh nghi ngờ
+            currentDetectionTime += Time.deltaTime;
+
+            // Bắt lính gác đứng lại và xoay mặt chằm chằm về phía Kim Đồng
+            if (currentState == GuardState.Patrol)
+            {
+                agent.isStopped = true;
+                Vector3 lookPos = player.position - transform.position;
+                lookPos.y = 0;
+                if (lookPos != Vector3.zero)
+                {
+                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(lookPos), Time.deltaTime * 5f);
+                }
+            }
+
+            // Nếu thời gian nhìn thấy đủ lâu -> CHASE
+            if (currentDetectionTime >= timeToDetect)
+            {
+                currentState = GuardState.Chase;
+                StopAllCoroutines();
+                isPerformingAction = false;
+                agent.isStopped = false;
+                agent.speed = runSpeed;
+
+                if (anim != null) anim.SetBool("isChasing", true);
+            }
+        }
+        else
+        {
+            // Không nhìn thấy nữa -> Tụt thanh nghi ngờ từ từ
+            if (currentDetectionTime > 0)
+            {
+                currentDetectionTime -= Time.deltaTime;
+                if (currentDetectionTime <= 0)
+                {
+                    currentDetectionTime = 0;
+
+                    // Nếu tụt hết nghi ngờ và không bận đi điều tra tiếng động, cho đi tuần lại
+                    if (currentState == GuardState.Patrol && !isPerformingAction)
+                    {
+                        agent.isStopped = false;
+                    }
+                }
+            }
+        }
+    }
+
+    bool CanSeePlayer()
+    {
+        if (player == null) return false;
+
+        float currentRadius = isNightTime ? nightViewRadius : dayViewRadius;
+        float currentAngle = isNightTime ? nightViewAngle : dayViewAngle;
+
+        Vector3 eyePos = transform.position + Vector3.up * 1.5f;
+        Vector3 targetPos = player.position + Vector3.up * 1.2f; // Tâm người Kim Đồng
+        Vector3 dirToTarget = (targetPos - eyePos).normalized;
+
+        float dstToTarget = Vector3.Distance(eyePos, targetPos);
+
+        // Kiểm tra xem có nằm trong bán kính không
+        if (dstToTarget <= currentRadius)
+        {
+            // Kiểm tra xem có nằm trong góc nhìn không
+            if (Vector3.Angle(transform.forward, dirToTarget) < currentAngle / 2)
+            {
+                // Bắn tia Raycast xem có bị tường cản không
+                if (!Physics.Raycast(eyePos, dirToTarget, dstToTarget, obstacleMask))
+                {
+                    return true; // NHÌN THẤY
+                }
+            }
+        }
+        return false;
     }
 
     void PatrolBehavior()
@@ -193,7 +306,6 @@ public class GuardRandomPatrol : MonoBehaviour
         if (currentState == GuardState.Patrol)
         {
             StopAllCoroutines();
-            StartCoroutine(FindPlayerWithDelay(0.2f));
             investigateCoroutine = StartCoroutine(InvestigateRoutine(soundPosition));
         }
     }
@@ -242,18 +354,13 @@ public class GuardRandomPatrol : MonoBehaviour
 
     void ChaseBehavior()
     {
-        if (player == null)
-        {
-            GameObject p = GameObject.FindGameObjectWithTag("Player");
-            if (p != null) player = p.transform;
-            else return;
-        }
+        if (player == null) return;
 
         agent.SetDestination(player.position);
 
-        // ===== BẮT ĐƯỢC PLAYER =====
         if (Vector3.Distance(transform.position, player.position) <= 1.5f)
         {
+            // Dòng code của bạn có vẻ đang gọi tới StealthMissionManager, nếu bị lỗi đỏ bạn hãy kiểm tra lại đường dẫn nhé
             if (StealthMissionManager.Instance != null)
             {
                 StealthMissionManager.Instance.FailMission("Kim Đồng bị bắt... cuộc liên lạc thất bại.");
@@ -262,49 +369,6 @@ public class GuardRandomPatrol : MonoBehaviour
             agent.isStopped = true;
             if (anim != null) anim.SetBool("isChasing", false);
             this.enabled = false;
-        }
-    }
-
-    IEnumerator FindPlayerWithDelay(float delay)
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(delay);
-            if (currentState != GuardState.Chase)
-                FindVisiblePlayer();
-        }
-    }
-
-    void FindVisiblePlayer()
-    {
-        float currentRadius = isNightTime ? nightViewRadius : dayViewRadius;
-        float currentAngle = isNightTime ? nightViewAngle : dayViewAngle;
-
-        Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, currentRadius, playerMask);
-
-        for (int i = 0; i < targetsInViewRadius.Length; i++)
-        {
-            Transform target = targetsInViewRadius[i].transform;
-
-            Vector3 eyePos = transform.position + Vector3.up * 1.5f;
-            Vector3 targetPos = target.position + Vector3.up * 1.2f;
-            Vector3 dirToTarget = (targetPos - eyePos).normalized;
-
-            if (Vector3.Angle(transform.forward, (target.position - transform.position).normalized) < currentAngle / 2)
-            {
-                float dstToTarget = Vector3.Distance(eyePos, targetPos);
-
-                if (!Physics.Raycast(eyePos, dirToTarget, dstToTarget, obstacleMask))
-                {
-                    currentState = GuardState.Chase;
-                    StopAllCoroutines();
-                    isPerformingAction = false;
-                    agent.isStopped = false;
-                    agent.speed = runSpeed;
-
-                    if (anim != null) anim.SetBool("isChasing", true);
-                }
-            }
         }
     }
 }

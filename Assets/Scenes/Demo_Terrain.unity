@@ -1288,7 +1288,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 150, y: -50}
+  m_AnchoredPosition: {x: 350, y: -30}
   m_SizeDelta: {x: 1080, y: 180}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &68907821
@@ -1304,15 +1304,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.5882353}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: 181827399, guid: a26041b65210ba84ea63c4f6112cd799, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -2780,11 +2780,13 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 64
+  timeToDetect: 1.5
   walkSpeed: 2
   runSpeed: 4
   footstepAudioSource: {fileID: 189165701}
   enemyFootstepClip: {fileID: 8300000, guid: 6ed1f5b80ccd88f4e84cdcb09a810cea, type: 3}
-  footstepVolume: 1
+  walkVolume: 0.7
+  runVolume: 1
   walkStepInterval: 0.6
   runStepInterval: 0.35
 --- !u!136 &189165698
@@ -2853,7 +2855,7 @@ AudioSource:
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
-  MinDistance: 2
+  MinDistance: 4
   MaxDistance: 9
   Pan2D: 0
   rolloffMode: 1
@@ -3558,11 +3560,13 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 64
+  timeToDetect: 1.5
   walkSpeed: 2
   runSpeed: 4
   footstepAudioSource: {fileID: 214492186}
   enemyFootstepClip: {fileID: 8300000, guid: 6ed1f5b80ccd88f4e84cdcb09a810cea, type: 3}
-  footstepVolume: 1
+  walkVolume: 0.7
+  runVolume: 1
   walkStepInterval: 0.6
   runStepInterval: 0.35
 --- !u!136 &214492183
@@ -3631,7 +3635,7 @@ AudioSource:
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
-  MinDistance: 2
+  MinDistance: 4
   MaxDistance: 9
   Pan2D: 0
   rolloffMode: 1
@@ -4369,11 +4373,13 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 64
+  timeToDetect: 1.5
   walkSpeed: 2
   runSpeed: 4
   footstepAudioSource: {fileID: 290153961}
   enemyFootstepClip: {fileID: 8300000, guid: 6ed1f5b80ccd88f4e84cdcb09a810cea, type: 3}
-  footstepVolume: 1
+  walkVolume: 0.7
+  runVolume: 1
   walkStepInterval: 0.6
   runStepInterval: 0.35
 --- !u!136 &290153958
@@ -4442,7 +4448,7 @@ AudioSource:
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
-  MinDistance: 2
+  MinDistance: 4
   MaxDistance: 9
   Pan2D: 0
   rolloffMode: 1
@@ -5181,7 +5187,7 @@ AudioSource:
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
-  MinDistance: 2
+  MinDistance: 4
   MaxDistance: 9
   Pan2D: 0
   rolloffMode: 1
@@ -7516,8 +7522,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -150}
-  m_SizeDelta: {x: 500, y: 200}
+  m_AnchoredPosition: {x: 0, y: -200}
+  m_SizeDelta: {x: 1000, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &446545912
 MonoBehaviour:
@@ -7532,15 +7538,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.5882353}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: 21300000, guid: c866a7333fadb944bb5ad54dc6acc154, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -16204,6 +16210,7 @@ GameObject:
   - component: {fileID: 874874904}
   - component: {fileID: 874874903}
   - component: {fileID: 874874902}
+  - component: {fileID: 874874905}
   m_Layer: 0
   m_Name: _GameManager
   m_TagString: Untagged
@@ -16223,7 +16230,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f0c458b144b30d49896d764b82752fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIManager
-  leftMissionPanel: {fileID: 0}
+  leftMissionPanel: {fileID: 446545910}
   txtMissionName: {fileID: 1161825888}
   txtMissionDetail: {fileID: 1520812084}
   txtDistance: {fileID: 2031008018}
@@ -16231,6 +16238,8 @@ MonoBehaviour:
   txtTopNotif: {fileID: 726042505}
   bottomDialoguePanel: {fileID: 1530861309}
   txtBottomDialogue: {fileID: 519856780}
+  typingSpeed: 0.1
+  voiceSource: {fileID: 874874905}
   blackScreen: {fileID: 783664173}
   winFirework: {fileID: 0}
   interactPanel: {fileID: 2092847871}
@@ -16280,19 +16289,42 @@ MonoBehaviour:
   mission3_EscortActive: 0
   mission3_AutoStartEscortOnEnter: 1
   mission3_ReminderInterval: 18
+  v_StartPhase1: {fileID: 8300000, guid: 001b077cf4e18e94bbaded5427db0e5d, type: 3}
+  v_PickLetter1: {fileID: 8300000, guid: ebd092075f9fc254998f040922710196, type: 3}
+  v_PickLetter2: {fileID: 8300000, guid: ed4039de1ee26304c998885ce57c2ec8, type: 3}
+  v_StartPhase2: {fileID: 8300000, guid: 8c1c647e35ede8d45b4c69de892a01b7, type: 3}
+  v_StartPhase3: {fileID: 8300000, guid: 92b4598ad4a2f69468f7d8561af708fa, type: 3}
+  v_m3_Brief1: {fileID: 8300000, guid: 188450779bba6ca44a3e40a4bc29db30, type: 3}
+  v_m3_Brief2: {fileID: 8300000, guid: 5de240a1157f2fb4cbbdbcb1c45534e2, type: 3}
+  v_m3_Approach: {fileID: 8300000, guid: 26873c491b627274d9c63a86c2347301, type: 3}
+  v_m3_StartEscort1: {fileID: 8300000, guid: 45d6dd05d1694544d8f3c595df482282, type: 3}
+  v_m3_StartEscort2: {fileID: 8300000, guid: b8c477f50b0c0fb46a050e8bf4108dce, type: 3}
+  v_m3_Reminder1: {fileID: 8300000, guid: fb4cc935b80a6b24caee5ed8d8cdb72e, type: 3}
+  v_m3_Reminder2: {fileID: 8300000, guid: 22d18e4b3322cd64bb09c76823269514, type: 3}
+  v_m3_Reminder3: {fileID: 0}
+  v_EndGame: {fileID: 8300000, guid: d4e93de39278a63408f7f70d92cc5d0b, type: 3}
+  msg_StartPhase1: "Kim \u0110\u1ED3ng: Su\u1EF5t! Anh/ch\u1ECB \u01A1i, c\xF3 m\u1ED9t
+    m\u1EADt th\u01B0 gi\u1EA5u trong hang \u0111\xE1. \u0110i theo la b\xE0n \u0111\u1EC3
+    t\xECm nh\xE9, nh\u1EDB c\u1EA9n th\u1EADn l\xEDnh g\xE1c!"
+  msg_PickLetter1: "Kim \u0110\u1ED3ng: Tuy\u1EC7t qu\xE1! C\xF3 th\u01B0 r\u1ED3i.
+    Gi\u1EDD anh/ch\u1ECB gi\xFAp em lu\u1ED3n l\xE1ch qua h\xE0ng r\xE0o \u0111\u1ECBch
+    mang v\u1EC1 L\xE0ng an to\xE0n nh\xE9."
+  msg_StartPhase2: "Kim \u0110\u1ED3ng: \u0110\xEAm xu\u1ED1ng r\u1ED3i... B\u1ECDn
+    \u0111\u1ECBch canh g\xE1c k\u1EF9 l\u1EAFm. Anh/ch\u1ECB r\xE1ng t\xECm gi\xFAp
+    em m\u1EADt th\u01B0 th\u1EADt \u1EDF \u0111\u1ED3n \u0111\u1ECBch nha."
+  msg_PickLetter2: "Kim \u0110\u1ED3ng: L\u1EA5y \u0111\u01B0\u1EE3c m\u1EADt th\u01B0
+    r\u1ED3i! M\xECnh r\xFAt lui ngay th\xF4i k\u1EBBo ch\xFAng ph\xE1t hi\u1EC7n!"
+  msg_StartPhase3: "Kim \u0110\u1ED3ng: Xong nhi\u1EC7m v\u1EE5 2 r\u1ED3i! B\xE2y
+    gi\u1EDD l\xE0 l\xFAc quan tr\u1ECDng nh\u1EA5t, m\xECnh \u0111i \u0111\xF3n
+    c\xE1n b\u1ED9 nh\xE9 anh/ch\u1ECB!"
   mission3_Brief_1: "H\u1EC7 th\u1ED1ng: Nhi\u1EC7m v\u1EE5 3 b\u1EAFt \u0111\u1EA7u.
     \u0110\u1ED3ng ch\xED ph\u1EA3i h\u1ED9 t\u1ED1ng c\xE1n b\u1ED9 v\u01B0\u1EE3t
     qua khu v\u1EF1c nguy hi\u1EC3m trong \u0111\xEAm."
   mission3_Brief_2: "H\u1EC7 th\u1ED1ng: Tuy\u1EC7t \u0111\u1ED1i tr\xE1nh v\xF9ng
     ph\xE1t hi\u1EC7n c\u1EE7a l\xEDnh g\xE1c. N\u1EBFu b\u1ECB l\u1ED9, nhi\u1EC7m
     v\u1EE5 s\u1EBD th\u1EA5t b\u1EA1i."
-  mission3_Brief_3: "Kim \u0110\u1ED3ng: R\xF5! T\xF4i s\u1EBD d\u1EABn \u0111\u01B0\u1EDDng
-    an to\xE0n."
   mission3_ApproachNPC_1: "H\u1EC7 th\u1ED1ng: Ti\u1EBFp c\u1EADn c\xE1n b\u1ED9
     \u0111\u1EC3 b\u1EAFt \u0111\u1EA7u h\u1ED9 t\u1ED1ng."
-  mission3_ApproachNPC_2: "Kim \u0110\u1ED3ng: \u0110\u1ED3ng ch\xED theo s\xE1t
-    t\xF4i, \u0111i th\u1EA5p ng\u01B0\u1EDDi\u2026 \u0111\u1EEBng \u0111\u1EC3 h\u1ECD
-    ph\xE1t hi\u1EC7n."
   mission3_StartEscort_1: "C\xE1n b\u1ED9: C\u1EA3m \u01A1n \u0111\u1ED3ng ch\xED.
     Ta ph\u1EA3i r\xFAt ngay, \u0111\u1ECBch tu\u1EA7n tra r\u1EA5t g\u1EAFt!"
   mission3_StartEscort_2: "Kim \u0110\u1ED3ng: Theo t\xF4i. N\u1EBFu nguy hi\u1EC3m,
@@ -16322,6 +16354,103 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &874874905
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 874874901}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1001 &876077454
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -22535,11 +22664,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 446545911}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 30, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 170, y: -60}
   m_SizeDelta: {x: 500, y: 100}
-  m_Pivot: {x: 0.5, y: 1}
+  m_Pivot: {x: 0, y: 1}
 --- !u!114 &1161825888
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22569,8 +22698,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -22593,7 +22722,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 3
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
@@ -33541,10 +33670,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 446545911}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.5}
-  m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 10, y: 0}
-  m_SizeDelta: {x: -20, y: 50}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 100, y: -25}
+  m_SizeDelta: {x: 880, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1520812084
 MonoBehaviour:
@@ -33575,8 +33704,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -33599,7 +33728,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 2
+  m_fontStyle: 3
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
@@ -42056,7 +42185,7 @@ PrefabInstance:
     - target: {fileID: 5759926005760030948, guid: 5cdaedddf5435e848b4303dff692735f, type: 3}
       propertyPath: pausePanel
       value: 
-      objectReference: {fileID: 360164217}
+      objectReference: {fileID: 1556247812}
     - target: {fileID: 5759926005760030948, guid: 5cdaedddf5435e848b4303dff692735f, type: 3}
       propertyPath: settingsPanel
       value: 
@@ -43416,7 +43545,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -20, y: 20}
+  m_AnchoredPosition: {x: -130, y: 50}
   m_SizeDelta: {x: 70, y: 50}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &2031008018
@@ -43450,8 +43579,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -43474,7 +43603,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 3
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
@@ -46411,6 +46540,18 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1473271251}
     - target: {fileID: 3472250730213534109, guid: 3dca449a9b3aa914b9f89eaf95837693, type: 3}
+      propertyPath: runVolume
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3472250730213534109, guid: 3dca449a9b3aa914b9f89eaf95837693, type: 3}
+      propertyPath: walkVolume
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 3472250730213534109, guid: 3dca449a9b3aa914b9f89eaf95837693, type: 3}
+      propertyPath: timeToDetect
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3472250730213534109, guid: 3dca449a9b3aa914b9f89eaf95837693, type: 3}
       propertyPath: enemyFootstepClip
       value: 
       objectReference: {fileID: 8300000, guid: 6ed1f5b80ccd88f4e84cdcb09a810cea, type: 3}
@@ -46947,6 +47088,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6925236295378678878, guid: 832f2c1e5d5c246439046790da4e842c, type: 3}
+      propertyPath: menuBGM
+      value: 
+      objectReference: {fileID: 8300000, guid: eb854e32bd296fb4fb046841b18e96b1, type: 3}
+    - target: {fileID: 6925236295378678878, guid: 832f2c1e5d5c246439046790da4e842c, type: 3}
       propertyPath: bgmSlider
       value: 
       objectReference: {fileID: 2638542679017130945}
@@ -46963,6 +47108,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: -1085819862, guid: cb6f15acc404f5742902741dd32d7454, type: 3}
     - target: {fileID: 6925236295378678878, guid: 832f2c1e5d5c246439046790da4e842c, type: 3}
+      propertyPath: gameplayBGM
+      value: 
+      objectReference: {fileID: 8300000, guid: 68a3676e2c7704448b4a4686553c17b7, type: 3}
+    - target: {fileID: 6925236295378678878, guid: 832f2c1e5d5c246439046790da4e842c, type: 3}
       propertyPath: sfxOnSprite
       value: 
       objectReference: {fileID: -1494952111, guid: cb6f15acc404f5742902741dd32d7454, type: 3}
@@ -46970,6 +47119,14 @@ PrefabInstance:
       propertyPath: bgmOffSprite
       value: 
       objectReference: {fileID: 2051537181, guid: cb6f15acc404f5742902741dd32d7454, type: 3}
+    - target: {fileID: 6925236295378678878, guid: 832f2c1e5d5c246439046790da4e842c, type: 3}
+      propertyPath: btnClickClip
+      value: 
+      objectReference: {fileID: 8300000, guid: de286e39037ff0949aaeb58214fdfd96, type: 3}
+    - target: {fileID: 6925236295378678878, guid: 832f2c1e5d5c246439046790da4e842c, type: 3}
+      propertyPath: fadeDuration
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 6925236295378678878, guid: 832f2c1e5d5c246439046790da4e842c, type: 3}
       propertyPath: sfxOffSprite
       value: 
@@ -47072,9 +47229,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 3000683690976359924}
-        m_TargetAssemblyTypeName: AudioManager, Assembly-CSharp
-        m_MethodName: ApplySettings
+      - m_Target: {fileID: 1990490277}
+        m_TargetAssemblyTypeName: ThirdPersonCamera, Assembly-CSharp
+        m_MethodName: ApplySettingsButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

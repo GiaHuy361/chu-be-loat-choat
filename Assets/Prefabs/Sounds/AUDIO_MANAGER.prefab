@@ -47,14 +47,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AudioManager
   audioMixer: {fileID: 0}
-  bgmGroup: {fileID: 5701112590704486193, guid: a9cf50871f6bda44e84ac222bf3a887f, type: 2}
-  sfxGroup: {fileID: 5059552999323842787, guid: a9cf50871f6bda44e84ac222bf3a887f, type: 2}
   bgmSource: {fileID: 8447228018204094470}
-  dayBGM: {fileID: 8300000, guid: b8555c94ebbaecc4fa16f4e0a05fd503, type: 3}
-  nightBGM: {fileID: 8300000, guid: b180f821c7d5cc94a9290d6e9294fec5, type: 3}
+  menuBGM: {fileID: 8300000, guid: eb854e32bd296fb4fb046841b18e96b1, type: 3}
+  gameplayBGM: {fileID: 8300000, guid: 68a3676e2c7704448b4a4686553c17b7, type: 3}
   fadeDuration: 1.5
   sfxSource: {fileID: 2840793050872681347}
   pickupClip: {fileID: 8300000, guid: 06df137e93a4e0043a5ccc4881cf3e07, type: 3}
+  btnClickClip: {fileID: 8300000, guid: de286e39037ff0949aaeb58214fdfd96, type: 3}
   bgmSlider: {fileID: 0}
   sfxSlider: {fileID: 0}
   bgmToggleImage: {fileID: 0}

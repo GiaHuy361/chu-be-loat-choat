@@ -30,7 +30,16 @@ public class MainMenuManager : MonoBehaviour
 
         if (Application.CanStreamedLevelBeLoaded(gameplayScene))
         {
-            SceneManager.LoadScene(gameplayScene);
+            // Thay vì tự load scene ngay lập tức, gọi AudioManager để nó chạy Coroutine Fade nhạc rồi tự chuyển cảnh
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.GoToGameplay(gameplayScene);
+            }
+            else
+            {
+                // Fallback trong trường hợp bạn lỡ xóa mất AudioManager lúc test
+                SceneManager.LoadScene(gameplayScene);
+            }
         }
         else
         {
@@ -41,6 +50,8 @@ public class MainMenuManager : MonoBehaviour
     // Gắn hàm này vào sự kiện OnClick() của nút SETTINGS
     public void OpenSettings()
     {
+        // Gọi âm thanh click thông qua Singleton
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayButtonClickSound();
 
         if (settingsPanel != null)
         {
@@ -52,6 +63,26 @@ public class MainMenuManager : MonoBehaviour
     // Gắn hàm này vào sự kiện OnClick() của nút BACK/APPLY trong bảng Settings
     public void CloseSettings()
     {
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayButtonClickSound();
+
+        if (settingsPanel != null)
+        {
+            settingsPanel.SetActive(false);
+            menuPanel.SetActive(true);
+        }
+    }
+
+    public void ApplySettingsButton()
+    {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayButtonClickSound();
+            AudioManager.Instance.ApplySettings(); // Lệnh này sẽ lưu mức âm lượng vào PlayerPrefs
+            Debug.Log("Đã lưu cài đặt âm thanh!");
+        }
+
+        // Tùy chọn: Nếu bạn muốn bấm Apply xong mà bảng Settings vẫn mở thì XÓA 4 dòng dưới đi.
+        // Còn nếu muốn bấm Apply xong tự động văng ra Menu luôn thì giữ lại:
         if (settingsPanel != null)
         {
             settingsPanel.SetActive(false);
@@ -62,6 +93,8 @@ public class MainMenuManager : MonoBehaviour
     // Gắn hàm này vào sự kiện OnClick() của nút QUIT
     public void QuitGame()
     {
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayButtonClickSound();
+
         Debug.Log("Quit Game (chỉ hoạt động khi Build)");
         Application.Quit();
     }
