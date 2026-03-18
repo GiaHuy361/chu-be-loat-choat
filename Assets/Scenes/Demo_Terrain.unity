@@ -47208,6 +47208,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 121404102, guid: cb6f15acc404f5742902741dd32d7454, type: 3}
     - target: {fileID: 6925236295378678878, guid: 832f2c1e5d5c246439046790da4e842c, type: 3}
+      propertyPath: bgmLevel1_Cave
+      value: 
+      objectReference: {fileID: 8300000, guid: df06ec9bcf08edc409c0e36e00d4efcb, type: 3}
+    - target: {fileID: 6925236295378678878, guid: 832f2c1e5d5c246439046790da4e842c, type: 3}
       propertyPath: bgmToggleImage
       value: 
       objectReference: {fileID: 125638699032899473}
@@ -47215,6 +47219,14 @@ PrefabInstance:
       propertyPath: sfxToggleImage
       value: 
       objectReference: {fileID: 925776244890792881}
+    - target: {fileID: 6925236295378678878, guid: 832f2c1e5d5c246439046790da4e842c, type: 3}
+      propertyPath: bgmLevel3_Escort
+      value: 
+      objectReference: {fileID: 8300000, guid: 526b742be13dc5a468ce395414178ed1, type: 3}
+    - target: {fileID: 6925236295378678878, guid: 832f2c1e5d5c246439046790da4e842c, type: 3}
+      propertyPath: bgmLevel2_Stealth
+      value: 
+      objectReference: {fileID: 8300000, guid: ad06e597b82ecdd49866dc3da6015085, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
